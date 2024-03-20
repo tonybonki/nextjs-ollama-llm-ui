@@ -1,4 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 interface Task {
   id: number;
@@ -21,12 +27,12 @@ const TaskComponent: React.FC = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const taskId = urlParams.get('task_id');
-  
+
     if (!taskId) {
       setError('Task ID not found in URL');
       return;
     }
-  
+
     const fetchTask = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/get_task/${taskId}/`, {
@@ -37,6 +43,9 @@ const TaskComponent: React.FC = () => {
           credentials: 'include',
           body: JSON.stringify({}),
         });
+        if (!response.ok) {
+          throw new Error('Failed to fetch task');
+        }
         const data = await response.json();
         setTask(data.task);
         setTopic(data.topic);
@@ -44,13 +53,12 @@ const TaskComponent: React.FC = () => {
         setError((error as Error)?.message || 'An error occurred');
       }
     };
-  
+
     fetchTask();
   }, []);
-  
 
-  const handleStartTask = () => {
-    window.location.href = `http://localhost:3000/?task_id=${task?.id}`;
+  const handleGoBack = () => {
+    window.location.href = 'http://localhost:8000/classrooms/pupil_dashboard/';
   };
 
   if (error) {
@@ -62,13 +70,27 @@ const TaskComponent: React.FC = () => {
   }
 
   return (
-    <div>
-      <h2>Task Details</h2>
-      <p>Title: {task.title}</p>
-      <p>Description: {task.description}</p>
-      <p>Conversation Duration Time: {task.conversation_duration_time}</p>
-      <button className="btn btn-primary" onClick={handleStartTask}>Start Task</button>
-    </div>
+    <Box sx={{ minWidth: 275 }}>
+      <Card>
+        <CardContent>
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            Task Details
+          </Typography>
+          <Typography variant="h5" component="div" gutterBottom>
+            Title: {task.title}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Description: {task.description}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Conversation Duration Time: {task.conversation_duration_time}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          <Button size="small" onClick={handleGoBack}>Go Back</Button>
+        </CardActions>
+      </Card>
+    </Box>
   );
 };
 

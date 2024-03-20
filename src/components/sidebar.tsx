@@ -97,7 +97,14 @@ export function Sidebar({
   };
 
   const handleDeleteChat = (chatId: string) => {
+    // Removes the chat messages from local storage
     localStorage.removeItem(chatId);
+    // Removes the corresponding task ID from local storage
+    const currentTaskId = localStorage.getItem('currentTaskId');
+    if (currentTaskId === chatId.substr(5)) {
+      localStorage.removeItem('currentTaskId');
+    }
+    // Updates the local chats state
     setLocalChats(getLocalstorageChats());
   };
 
@@ -105,7 +112,7 @@ export function Sidebar({
     <div
       data-collapsed={isCollapsed}
       className="relative justify-between group lg:bg-accent/20 lg:dark:bg-card/35 flex flex-col h-full gap-4 p-2 data-[collapsed=true]:p-2 "
-    ><TaskComponent/>
+    >
       <div className=" flex flex-col justify-between p-2 max-h-fit overflow-y-auto">
         <Button
           onClick={() => {
@@ -128,7 +135,7 @@ export function Sidebar({
           </div>
           <SquarePen size={18} className="shrink-0 w-4 h-4" />
         </Button>
-
+        {/* Task Component */}
         <div className="flex flex-col pt-10 gap-2">
           <p className="pl-4 text-s text-muted-foreground">Your chats</p>
           {localChats.length > 0 && (
@@ -154,7 +161,6 @@ export function Sidebar({
                       </span>
                     </div>
                   </div>
-                  
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -202,6 +208,9 @@ export function Sidebar({
           )}
           {isLoading && <SidebarSkeleton />}
         </div>
+        <TaskComponent/>
+
+      
       </div>
 
       <div className="justify-end px-2 py-2 w-full border-t">
