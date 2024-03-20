@@ -116,7 +116,7 @@ export function Sidebar({
           <div className="flex gap-3 items-center ">
             {!isCollapsed && !isMobile && (
               <Image
-                src="/ollama.png"
+                src="/convolang.png"
                 alt="AI"
                 width={28}
                 height={28}
@@ -129,7 +129,7 @@ export function Sidebar({
         </Button>
 
         <div className="flex flex-col pt-10 gap-2">
-          <p className="pl-4 text-xs text-muted-foreground">Your chats</p>
+          <p className="pl-4 text-s text-muted-foreground">Your chats</p>
           {localChats.length > 0 && (
             <div>
               {localChats.map(({ chatId, messages }, index) => (

@@ -42,7 +42,7 @@ export default function ChatList({
       <div className="w-full h-full flex justify-center items-center">
         <div className="flex flex-col gap-4 items-center">
           <Image
-            src="/ollama.png"
+            src="/convolang.png"
             alt="AI"
             width={60}
             height={60}
@@ -106,7 +106,7 @@ export default function ChatList({
                 <div className="flex items-end gap-2">
                   <Avatar className="flex justify-start items-center">
                     <AvatarImage
-                      src="/ollama.png"
+                      src="/convolang.png"
                       alt="AI"
                       width={6}
                       height={6}

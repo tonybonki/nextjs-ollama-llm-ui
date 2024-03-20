@@ -21,15 +21,15 @@ export function ModeToggle() {
         <Button variant="outline" className="justify-start">
           {theme === "light" && (
             <div className="flex justify-between w-full scale-100 dark:scale-0">
-            <p>Light mode</p>
-            <ChevronDownIcon className="w-5 h-5" />
-          </div>
+              <p>Light mode</p>
+              <ChevronDownIcon className="w-5 h-5" />
+            </div>
           )}
           {theme === "dark" && (
             <div className=" flex justify-between w-full scale-0 dark:scale-100">
-            <p>Dark mode</p>
-            <ChevronDownIcon className="w-5 h-5" />
-          </div>
+              <p>Dark mode</p>
+              <ChevronDownIcon className="w-5 h-5" />
+            </div>
           )}
           <span className="sr-only">Toggle theme</span>
         </Button>
