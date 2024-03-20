@@ -48,8 +48,8 @@ export default function ChatList({
             height={60}
             className="h-20 w-14 object-contain dark:invert"
           />
-          <p className="text-center text-lg text-muted-foreground">
-            How can I help you today?
+          <p className="text-center text-xl text-muted-foreground">
+            What will we be learning today?
           </p>
         </div>
       </div>
