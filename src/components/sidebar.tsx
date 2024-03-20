@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import SidebarSkeleton from "./sidebar-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import UserSettings from "./user-settings";
+import TaskComponent from "@/app/api/django/DjangoApiComponent";
 import { useLocalStorageData } from "@/app/hooks/useLocalStorageData";
 import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
 import PullModel from "./pull-model";
@@ -104,7 +105,7 @@ export function Sidebar({
     <div
       data-collapsed={isCollapsed}
       className="relative justify-between group lg:bg-accent/20 lg:dark:bg-card/35 flex flex-col h-full gap-4 p-2 data-[collapsed=true]:p-2 "
-    >
+    ><TaskComponent/>
       <div className=" flex flex-col justify-between p-2 max-h-fit overflow-y-auto">
         <Button
           onClick={() => {
@@ -153,6 +154,7 @@ export function Sidebar({
                       </span>
                     </div>
                   </div>
+                  
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
