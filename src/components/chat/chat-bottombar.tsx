@@ -10,6 +10,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Textarea } from "../ui/textarea";
 import { EmojiPicker } from "../emoji-picker";
 import { ImageIcon, PaperPlaneIcon, StopIcon } from "@radix-ui/react-icons";
+import { Player } from '@lordicon/react';
+import lottie from 'lottie-web';
+import VoiceChatIcon from '../../../public/voice-chat.json'
+import LoadingIcon from '../../../public/loading.json'
 
 export default function ChatBottombar({
   messages,
@@ -39,7 +43,12 @@ export default function ChatBottombar({
     }
   }, [handleInputChange, transcript]);
 
-  
+  // ICONS
+  const playerRef = useRef<Player>(null);
+
+  useEffect(() => {
+    playerRef.current?.playFromBeginning();
+}, [])
 
   const startListening = () => {
     setIsListening(true);
@@ -115,9 +124,18 @@ export default function ChatBottombar({
                   buttonVariants({ variant: "secondary", size: "icon" })
                 )}
               >
-                <ImageIcon
-                  className="w-6 h-6 text-muted-foreground"
-                />
+                {isListening ? (
+                   <Player 
+                   ref={playerRef} 
+                   onComplete={() => playerRef.current?.playFromBeginning()}
+                   icon={ LoadingIcon }
+                 />
+                ) : (
+                  <Player 
+                    ref={playerRef} 
+                    icon={ VoiceChatIcon }
+                  />
+                )}
               </Link>
             </div>
 
