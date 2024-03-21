@@ -1,6 +1,5 @@
-"use client";
-
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { ChatProps } from "./chat";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Link from "next/link";
@@ -21,9 +20,36 @@ export default function ChatBottombar({
   error,
   stop,
 }: ChatProps) {
-  const [message, setMessage] = React.useState(input);
-  const [isMobile, setIsMobile] = React.useState(false);
-  const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  const { transcript, resetTranscript } = useSpeechRecognition();
+  const [isListening, setIsListening] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (transcript) {
+      // Create a synthetic event object
+      const syntheticEvent = {
+        target: {
+          value: transcript
+        }
+      };
+
+      // Call handleInputChange with the synthetic event object
+      handleInputChange(syntheticEvent as React.ChangeEvent<HTMLTextAreaElement>);
+    }
+  }, [handleInputChange, transcript]);
+
+  
+
+  const startListening = () => {
+    setIsListening(true);
+    SpeechRecognition.startListening({ language: 'fr-FR' });
+  };
+
+  const stopListening = () => {
+    setIsListening(false);
+    SpeechRecognition.stopListening();
+  };
 
   React.useEffect(() => {
     const checkScreenWidth = () => {
@@ -67,19 +93,35 @@ export default function ChatBottombar({
             },
           }}
         >
-          <form onSubmit={handleSubmit} className="w-full items-center flex relative gap-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+            }}
+            className="w-full items-center flex relative gap-2"
+          >
             <div className="flex">
               <Link
                 href="#"
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent default behavior
+                  if (isListening) {
+                    stopListening();
+                  } else {
+                    startListening(); // Trigger speech recognition
+                  }
+                }}
                 className={cn(
-                  buttonVariants({ variant: "secondary", size: "icon" }),
+                  buttonVariants({ variant: "secondary", size: "icon" })
                 )}
               >
-                <ImageIcon className="w-6 h-6 text-muted-foreground" />
+                <ImageIcon
+                  className="w-6 h-6 text-muted-foreground"
+                />
               </Link>
             </div>
 
-            <TextareaAutosize 
+            <TextareaAutosize
               autoComplete="off"
               value={input}
               ref={inputRef}
@@ -89,15 +131,26 @@ export default function ChatBottombar({
               placeholder="What is our topic for today?"
               className="border-input max-h-20 px-5 py-4 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 w-full border rounded-full flex items-center h-14 resize-none overflow-hidden dark:bg-card/35"
             />
-              {!isLoading ? (
-                <Button className="shrink-0" variant="secondary" size="icon" type="submit" disabled={isLoading || !input.trim()}>
+            {!isLoading ? (
+              <Button
+                className="shrink-0"
+                variant="secondary"
+                size="icon"
+                type="submit"
+                disabled={isLoading || !input.trim()}
+              >
                 <PaperPlaneIcon className=" w-6 h-6 text-muted-foreground" />
               </Button>
-              ) : (
-                <Button className="shrink-0" variant="secondary" size="icon" onClick={stop} >
-              <StopIcon className="w-6 h-6  text-muted-foreground" />
-            </Button>
-              )}
+            ) : (
+              <Button
+                className="shrink-0"
+                variant="secondary"
+                size="icon"
+                onClick={stop}
+              >
+                <StopIcon className="w-6 h-6  text-muted-foreground" />
+              </Button>
+            )}
           </form>
         </motion.div>
       </AnimatePresence>

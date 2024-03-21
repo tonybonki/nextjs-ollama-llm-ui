@@ -23,15 +23,19 @@ const TaskComponent: React.FC = () => {
   const [task, setTask] = useState<Task | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [taskId, setTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const taskId = urlParams.get('task_id');
 
     if (!taskId) {
-      setError('Task ID not found in URL');
+      // Hide the component if task ID is not found
+      setTaskId(null);
       return;
     }
+
+    setTaskId(taskId);
 
     const fetchTask = async () => {
       try {
@@ -60,6 +64,11 @@ const TaskComponent: React.FC = () => {
   const handleGoBack = () => {
     window.location.href = 'http://localhost:8000/classrooms/pupil_dashboard/';
   };
+
+  // Hide the component if task ID is not found
+  if (!taskId) {
+    return null;
+  }
 
   if (error) {
     return <div>Error: {error}</div>;
