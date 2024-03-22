@@ -73,7 +73,7 @@ export default function ChatTopbar({
       }
     };
     fetchData();
-  }, []);
+  }, [setSelectedModel]);
 
   const handleModelChange = (model: string) => {
     setCurrentModel(model);

@@ -24,54 +24,60 @@ export default function ChatBottombar({
   error,
   stop,
 }: ChatProps) {
-  const { transcript, resetTranscript } = useSpeechRecognition();
+  const { transcript, resetTranscript, listening } = useSpeechRecognition();
   const [isListening, setIsListening] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false); 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
+    setIsListening(listening);
+  }, [listening]);
+
+  useEffect(() => {
     if (transcript) {
-      // Create a synthetic event object
       const syntheticEvent = {
         target: {
           value: transcript
         }
       };
-
-      // Call handleInputChange with the synthetic event object
       handleInputChange(syntheticEvent as React.ChangeEvent<HTMLTextAreaElement>);
     }
   }, [handleInputChange, transcript]);
 
-  // ICONS
   const playerRef = useRef<Player>(null);
 
   useEffect(() => {
-    playerRef.current?.playFromBeginning();
-}, [])
+    if (isListening) {
+      playerRef.current?.playFromBeginning();
+      setIsButtonDisabled(true);
+    } else {
+      setIsButtonDisabled(false);
+    }
+  }, [isListening]);
 
   const startListening = () => {
     setIsListening(true);
+    setIsButtonDisabled(true);
     SpeechRecognition.startListening({ language: 'fr-FR' });
   };
 
   const stopListening = () => {
     setIsListening(false);
+    setIsButtonDisabled(true);
     SpeechRecognition.stopListening();
+  };
+
+  const handleSpeechRecognitionEnd = () => {
+    setIsButtonDisabled(false);
   };
 
   React.useEffect(() => {
     const checkScreenWidth = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-
-    // Initial check
     checkScreenWidth();
-
-    // Event listener for screen width changes
     window.addEventListener("resize", checkScreenWidth);
-
-    // Cleanup the event listener on component unmount
     return () => {
       window.removeEventListener("resize", checkScreenWidth);
     };
@@ -110,33 +116,34 @@ export default function ChatBottombar({
             className="w-full items-center flex relative gap-2"
           >
             <div className="flex">
-              <Link
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault(); // Prevent default behavior
-                  if (isListening) {
-                    stopListening();
-                  } else {
-                    startListening(); // Trigger speech recognition
-                  }
-                }}
-                className={cn(
-                  buttonVariants({ variant: "secondary", size: "icon" })
-                )}
-              >
-                {isListening ? (
-                   <Player 
-                   ref={playerRef} 
-                   onComplete={() => playerRef.current?.playFromBeginning()}
-                   icon={ LoadingIcon }
-                 />
-                ) : (
-                  <Player 
-                    ref={playerRef} 
-                    icon={ VoiceChatIcon }
-                  />
-                )}
-              </Link>
+            <button
+             
+              onClick={(e) => {
+                e.preventDefault();
+                if (isListening) {
+                  stopListening();
+                } else {
+                  startListening();
+                }
+              }}
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "icon" })
+              )}
+            >
+              {isListening ? (
+                <Player 
+                  ref={playerRef} 
+                  onComplete={() => playerRef.current?.playFromBeginning()}
+                  icon={LoadingIcon}
+                />
+              ) : (
+                <Player
+                  ref={playerRef} 
+                  icon={VoiceChatIcon}
+                />
+              )}
+            </button>
+
             </div>
 
             <TextareaAutosize
@@ -146,7 +153,7 @@ export default function ChatBottombar({
               onKeyDown={handleKeyPress}
               onChange={handleInputChange}
               name="message"
-              placeholder="What is our topic for today?"
+              placeholder={isListening ? "I'm listening...very carefully" : "What would you like to talk about?"}
               className="border-input max-h-20 px-5 py-4 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 w-full border rounded-full flex items-center h-14 resize-none overflow-hidden dark:bg-card/35"
             />
             {!isLoading ? (
@@ -155,9 +162,9 @@ export default function ChatBottombar({
                 variant="secondary"
                 size="icon"
                 type="submit"
-                disabled={isLoading || !input.trim()}
+                disabled={isLoading || !input.trim() || isButtonDisabled}
               >
-                <PaperPlaneIcon className=" w-6 h-6 text-muted-foreground" />
+                <PaperPlaneIcon color="#5171FF" className=" w-6 h-6" />
               </Button>
             ) : (
               <Button
@@ -166,7 +173,7 @@ export default function ChatBottombar({
                 size="icon"
                 onClick={stop}
               >
-                <StopIcon className="w-6 h-6  text-muted-foreground" />
+                <StopIcon className="w-6 h-6"  color="#5171FF" />
               </Button>
             )}
           </form>
