@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { ChatProps } from "./chat";
+import LanguageSelectionPopover from "./LanugageSelectionPopover";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ export default function ChatBottombar({
   const [isMobile, setIsMobile] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false); 
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState('en-EN');
 
   useEffect(() => {
     setIsListening(listening);
@@ -145,7 +147,7 @@ export default function ChatBottombar({
             </button>
 
             </div>
-
+            <LanguageSelectionPopover onSelectLanguage={setSelectedLanguage} />
             <TextareaAutosize
               autoComplete="off"
               value={input}

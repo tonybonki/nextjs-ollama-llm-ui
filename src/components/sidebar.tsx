@@ -14,6 +14,7 @@ import TaskComponent from "@/app/api/django/DjangoApiComponent";
 import { useLocalStorageData } from "@/app/hooks/useLocalStorageData";
 import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
 import PullModel from "./pull-model";
+import LanguageSelectionPopover from "./chat/LanugageSelectionPopover";
 import {
   Dialog,
   DialogContent,
@@ -209,6 +210,7 @@ export function Sidebar({
           {isLoading && <SidebarSkeleton />}
         </div>
         <TaskComponent/>
+        {/* Voice Recognition Lanugage Component */}
 
       
       </div>
