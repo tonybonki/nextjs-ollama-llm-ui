@@ -1,0 +1,1 @@
+To edit tts function edit chat-list.txt function is inside that component. ;)

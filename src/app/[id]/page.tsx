@@ -27,7 +27,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setMessages(JSON.parse(item));
       }
     }
-  }, [setMessages]);
+  }, [params.id, setMessages]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,7 +54,7 @@ export default function Page({ params }: { params: { id: string } }) {
       // Trigger the storage event to update the sidebar component
       window.dispatchEvent(new Event("storage"));
     }
-  }, [messages, chatId, isLoading, error]);
+  }, [messages, chatId, isLoading, error, params.id]);
 
   return (
     <main className="flex h-[calc(100dvh)] flex-col items-center">

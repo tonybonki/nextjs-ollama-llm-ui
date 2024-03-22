@@ -1,5 +1,4 @@
-import { Message, useChat } from "ai/react";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -17,12 +16,61 @@ export default function ChatList({
   stop,
 }: ChatProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [name, setName] = React.useState<string>("");
-  const [localStorageIsLoading, setLocalStorageIsLoading] =
-    React.useState(true);
+  const [name, setName] = useState<string>("");
+  const [playingIndex, setPlayingIndex] = useState<number>(-1); // Index of the message being played
+  const [currentMessageIndex, setCurrentMessageIndex] = useState<number>(0); // Index of the last played message
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]); // Available voices
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null); // Selected voice
 
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  useEffect(() => {
+    // Fetch available voices when the component mounts
+    const fetchVoices = () => {
+      const synth = window.speechSynthesis;
+      const voices = synth.getVoices();
+      setVoices(voices);
+      // Automatically select a good English voice
+      const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+      const goodEnglishVoice = englishVoices.find(voice => voice.name.includes('English') && voice.lang.includes('US'));
+      setSelectedVoice(goodEnglishVoice || null);
+    };
+
+    fetchVoices();
+
+    // Add event listener to update voices when the list changes
+    window.speechSynthesis.addEventListener('voiceschanged', fetchVoices);
+
+    // Cleanup event listener
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', fetchVoices);
+    };
+  }, []);
+
+  const playMessage = (index: number) => {
+    if (!selectedVoice) {
+      console.error("No voice selected");
+      return;
+    }
+  
+    const messageContent = messages[index].content.replace(/[*]/g, ''); // Remove '*' characters
+    const utterance = new SpeechSynthesisUtterance(messageContent);
+    utterance.voice = selectedVoice;
+  
+    utterance.addEventListener('end', () => {
+      setCurrentMessageIndex(index + 1); // Move to the next message
+      if (index + 1 < messages.length && index + 1 === currentMessageIndex && playingIndex === index) {
+        playMessage(index + 1); // Play the next message
+      } else {
+        setPlayingIndex(-1); // Stop playing when all messages are played or manually stopped
+      }
+    });
+    setPlayingIndex(index);
+    window.speechSynthesis.speak(utterance);
+  };
+  
+
+  const stopPlaying = () => {
+    setPlayingIndex(-1);
+    window.speechSynthesis.cancel();
   };
 
   useEffect(() => {
@@ -33,28 +81,12 @@ export default function ChatList({
     const username = localStorage.getItem("ollama_user");
     if (username) {
       setName(username);
-      setLocalStorageIsLoading(false);
     }
   }, []);
 
-  if (messages.length === 0) {
-    return (
-      <div className="w-full h-full flex justify-center items-center">
-        <div className="flex flex-col gap-4 items-center">
-          <Image
-            src="/convolang.png"
-            alt="AI"
-            width={60}
-            height={60}
-            className="h-20 w-14 object-contain"
-          />
-          <p className="text-center text-xl text-muted-foreground">
-            What will we be learning today?
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  };
 
   return (
     <div
@@ -115,14 +147,14 @@ export default function ChatList({
                   </Avatar>
                   <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
                     {/* Check if the message content contains a code block */}
-                    {message.content.split("```").map((part, index) => {
-                      if (index % 2 === 0) {
+                    {message.content.split("```").map((part, idx) => {
+                      if (idx % 2 === 0) {
                         return (
-                          <React.Fragment key={index}>{part}</React.Fragment>
+                          <React.Fragment key={idx}>{part}</React.Fragment>
                         );
                       } else {
                         return (
-                          <pre className="whitespace-pre-wrap" key={index}>
+                          <pre className="whitespace-pre-wrap" key={idx}>
                             <CodeDisplayBlock code={part} lang="" />
                           </pre>
                         );
@@ -134,6 +166,11 @@ export default function ChatList({
                           ...
                         </span>
                       )}
+                    {!playingIndex || playingIndex !== index ? ( // Render the play button if not playing
+                      <button onClick={() => playMessage(index)}>Play</button>
+                    ) : ( // Render the stop button if playing
+                      <button onClick={stopPlaying}>Stop</button>
+                    )}
                   </span>
                 </div>
               )}
