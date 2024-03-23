@@ -15,6 +15,7 @@ import { useLocalStorageData } from "@/app/hooks/useLocalStorageData";
 import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
 import PullModel from "./pull-model";
 import LanguageSelectionPopover from "./chat/LanugageSelectionPopover";
+
 import {
   Dialog,
   DialogContent,
@@ -64,7 +65,7 @@ export function Sidebar({
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []);
+  }, [chatId]);
 
   const getLocalstorageChats = (): {
     chatId: string;
@@ -136,9 +137,8 @@ export function Sidebar({
           </div>
           <SquarePen size={18} className="shrink-0 w-4 h-4" />
         </Button>
-        {/* Task Component */}
         <div className="flex flex-col pt-10 gap-2">
-          <p className="pl-4 text-s text-muted-foreground">Your chats</p>
+          <p className="pl-4 text-s text-muted-foreground">Your chats</p><hr />
           {localChats.length > 0 && (
             <div>
               {localChats.map(({ chatId, messages }, index) => (
@@ -168,7 +168,7 @@ export function Sidebar({
                         variant="ghost"
                         className="flex justify-end items-center"
                       >
-                        <MoreHorizontal size={15} className="shrink-0" />
+                        <MoreHorizontal color="#5171FF" size={15} className="shrink-0" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className=" ">
@@ -209,9 +209,8 @@ export function Sidebar({
           )}
           {isLoading && <SidebarSkeleton />}
         </div>
+        {/* Task Component */}
         <TaskComponent/>
-        {/* Voice Recognition Lanugage Component */}
-
       
       </div>
 
