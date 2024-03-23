@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ChatProps } from "./chat";
 import Image from "next/image";
 import CodeDisplayBlock from "../code-display-block";
+import { Button, buttonVariants } from "../ui/button";
 
 export default function ChatList({
   messages,
@@ -134,46 +135,55 @@ export default function ChatList({
                   </Avatar>
                 </div>
               )}
-              {message.role === "assistant" && (
-                <div className="flex items-end gap-2">
-                  <Avatar className="flex justify-start items-center">
-                    <AvatarImage
-                      src="/convolang.png"
-                      alt="AI"
-                      width={6}
-                      height={6}
-                      className="object-contain"
-                    />
-                  </Avatar>
-                  <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
-                    {/* Check if the message content contains a code block */}
-                    {message.content.split("```").map((part, idx) => {
-                      if (idx % 2 === 0) {
-                        return (
-                          <React.Fragment key={idx}>{part}</React.Fragment>
-                        );
-                      } else {
-                        return (
-                          <pre className="whitespace-pre-wrap" key={idx}>
-                            <CodeDisplayBlock code={part} lang="" />
-                          </pre>
-                        );
-                      }
-                    })}
-                    {isLoading &&
-                      messages.indexOf(message) === messages.length - 1 && (
-                        <span className="animate-pulse" aria-label="Typing">
-                          ...
-                        </span>
-                      )}
-                    {!playingIndex || playingIndex !== index ? ( // Render the play button if not playing
-                      <button onClick={() => playMessage(index)}>Play</button>
-                    ) : ( // Render the stop button if playing
-                      <button onClick={stopPlaying}>Stop</button>
-                    )}
+        {message.role === "assistant" && (
+          <div className="flex items-end gap-2">
+            <Avatar className="flex justify-start items-center">
+              <AvatarImage
+                src="/convolang.png"
+                alt="AI"
+                width={6}
+                height={6}
+                className="object-contain"
+              />
+            </Avatar>
+            <div className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto flex-grow">
+              {/* Check if the message content contains a code block */}
+              {message.content.split("```").map((part, idx) => {
+                if (idx % 2 === 0) {
+                  return (
+                    <React.Fragment key={idx}>{part}</React.Fragment>
+                  );
+                } else {
+                  return (
+                    <pre className="whitespace-pre-wrap" key={idx}>
+                      <CodeDisplayBlock code={part} lang="" />
+                    </pre>
+                  );
+                }
+              })}
+              {isLoading &&
+                messages.indexOf(message) === messages.length - 1 && (
+                  <span className="animate-pulse" aria-label="Typing">
+                    ...
                   </span>
-                </div>
-              )}
+                )}
+            </div>
+            {!playingIndex || playingIndex !== index ? ( // Render the play button if not playing
+              <button
+                
+                className={cn(
+                  buttonVariants({ variant: "default", size: "sm" })
+                )}
+                onClick={() => playMessage(index)}
+              >Listen</button>
+            ) : ( // Render the stop button if playing
+              <button 
+                className={cn(
+                  buttonVariants({ variant: "default", size: "sm" })
+                )} onClick={stopPlaying}>Stop</button>
+            )}
+          </div>
+        )}
             </div>
           </motion.div>
         ))}
