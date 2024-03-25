@@ -129,7 +129,7 @@ export default function ChatBottombar({
                 }
               }}
               className={cn(
-                buttonVariants({ variant: "secondary", size: "icon" })
+                buttonVariants({ variant: "default", size: "icon" })
               )}
             >
               {isListening ? (
