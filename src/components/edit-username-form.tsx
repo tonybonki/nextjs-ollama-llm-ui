@@ -57,35 +57,10 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
 
   return (
     <Form {...form}>
-       <div className="w-full flex flex-col gap-4 pt-8">
-       <FormLabel>Theme</FormLabel>
+       <div className="w-full flex flex-col gap-4 pt-3">
+       <FormLabel>Change Theme</FormLabel>
         <ModeToggle />
        </div>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <div className="md:flex gap-4">
-                  <Input
-                    {...field}
-                    type="text"
-                    value={name}
-                    onChange={(e) => handleChange(e)}
-                  />
-                  <Button type="submit">
-                    Change name
-                  </Button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </form>
     </Form>
   );
 }
